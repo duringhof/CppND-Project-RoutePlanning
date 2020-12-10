@@ -51,16 +51,32 @@ int main(int argc, const char **argv)
         else
             osm_data = std::move(*data);
     }
-    
-    // TODO 1: Declare floats `start_x`, `start_y`, `end_x`, and `end_y` and get
-    // user input for these values using std::cin. Pass the user input to the
-    // RoutePlanner object below in place of 10, 10, 90, 90.
+
+    std::vector<float> ui_coords{-1.0, -1.0, -1.0, -1.0};
+    std::vector<std::string> ui_coords_labels{"Start_X", "Start_Y", "End_X", "End_Y" };
+
+    for (int i = 0; i < 4; i++) {
+      while (0.0 > ui_coords[i] || ui_coords[i] > 100.0) {
+        std::cout << "Please enter your " << ui_coords_labels[i]
+                  << " coordinate: ";
+        std::cin >> ui_coords[i];
+        if (0.0 > ui_coords[i] || ui_coords[i] > 100.0)
+          std::cout << "That value is out of range !!! (pick a value between 0 and 100)" << std::endl;
+      }
+    }
+
+    std::cout << "You picked: " << ui_coords[0] << ", " << ui_coords[1] << ", " << ui_coords[2] << ", " << ui_coords[3] << std::endl;
+
+    float start_x = ui_coords[0];
+    float start_y = ui_coords[1];
+    float end_x = ui_coords[2];
+    float end_y = ui_coords[3];
 
     // Build Model.
     RouteModel model{osm_data};
 
     // Create RoutePlanner object and perform A* search.
-    RoutePlanner route_planner{model, 10, 10, 90, 90};
+    RoutePlanner route_planner{model, start_x, start_y, end_x, end_y};
     route_planner.AStarSearch();
 
     std::cout << "Distance: " << route_planner.GetDistance() << " meters. \n";
