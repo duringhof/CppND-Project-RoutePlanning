@@ -41,9 +41,19 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 // - Return the pointer.
 
 RouteModel::Node *RoutePlanner::NextNode() {
-
+  float cost = open_list[0]->h_value + open_list[0]->g_value;
+  float lowestcost = cost;
+  int nodetochoose = 0;
+  for (int i = 1; i <= open_list.size(); i++) {
+    cost = open_list[i]->h_value + open_list[i]->g_value;
+    if (cost < lowestcost) {
+      lowestcost = cost;
+      nodetochoose = i;
+    }
+  }
+  open_list.erase(open_list.begin()+nodetochoose);
+  return open_list[nodetochoose];
 }
-
 
 // TODO 6: Complete the ConstructFinalPath method to return the final path found from your A* search.
 // Tips:
