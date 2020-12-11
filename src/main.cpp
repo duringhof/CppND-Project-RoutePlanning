@@ -10,30 +10,36 @@
 
 using namespace std::experimental;
 
-static std::optional<std::vector<std::byte>> ReadFile(const std::string &path)
-{   
-    std::ifstream is{path, std::ios::binary | std::ios::ate};
-    if( !is )
-        return std::nullopt;
-    
-    auto size = is.tellg();
-    std::vector<std::byte> contents(size);    
-    
-    is.seekg(0);
-    is.read((char*)contents.data(), size);
+using std::ifstream;
+using std::string;
+using std::cin;
+using std::cout;
+using std::endl;
+using std::vector;
 
-    if( contents.empty() )
-        return std::nullopt;
-    return std::move(contents);
+static std::optional<std::vector<std::byte>> ReadFile(const std::string &path) {
+  ifstream is{path, std::ios::binary | std::ios::ate};
+  if (!is)
+    return std::nullopt;
+
+  auto size = is.tellg();
+  std::vector<std::byte> contents(size);
+
+  is.seekg(0);
+  is.read((char *)contents.data(), size);
+
+  if (contents.empty())
+    return std::nullopt;
+  return std::move(contents);
 }
 
 int main(int argc, const char **argv)
-{    
-    std::string osm_data_file = "";
-    if( argc > 1 ) {
-        for( int i = 1; i < argc; ++i )
-            if( std::string_view{argv[i]} == "-f" && ++i < argc )
-                osm_data_file = argv[i];
+{
+  string osm_data_file = "";
+  if (argc > 1) {
+    for (int i = 1; i < argc; ++i)
+      if (std::string_view{argv[i]} == "-f" && ++i < argc)
+        osm_data_file = argv[i];
     }
     else {
         std::cout << "To specify a map file use the following format: " << std::endl;
@@ -44,28 +50,31 @@ int main(int argc, const char **argv)
     std::vector<std::byte> osm_data;
  
     if( osm_data.empty() && !osm_data_file.empty() ) {
-        std::cout << "Reading OpenStreetMap data from the following file: " <<  osm_data_file << std::endl;
-        auto data = ReadFile(osm_data_file);
-        if( !data )
-            std::cout << "Failed to read." << std::endl;
-        else
-            osm_data = std::move(*data);
+      cout << "Reading OpenStreetMap data from the following file: "
+           << osm_data_file << endl;
+      auto data = ReadFile(osm_data_file);
+      if (!data)
+        cout << "Failed to read." << endl;
+      else
+        osm_data = std::move(*data);
     }
 
-    std::vector<float> ui_coords{-1.0, -1.0, -1.0, -1.0};
-    std::vector<std::string> ui_coords_labels{"Start_X", "Start_Y", "End_X", "End_Y" };
+    vector<float> ui_coords{-1.0, -1.0, -1.0, -1.0};
+    vector<string> ui_coords_labels{"Start_X", "Start_Y", "End_X", "End_Y"};
 
     for (int i = 0; i < 4; i++) {
       while (0.0 > ui_coords[i] || ui_coords[i] > 100.0) {
-        std::cout << "Please enter your " << ui_coords_labels[i]
-                  << " coordinate: ";
-        std::cin >> ui_coords[i];
+        cout << "Please enter your " << ui_coords_labels[i] << " coordinate: ";
+        cin >> ui_coords[i];
         if (0.0 > ui_coords[i] || ui_coords[i] > 100.0)
-          std::cout << "That value is out of range !!! (pick a value between 0 and 100)" << std::endl;
+          cout << "That value is out of range !!! (pick a value between 0 and "
+                  "100)"
+               << endl;
       }
     }
 
-    std::cout << "You picked: " << ui_coords[0] << ", " << ui_coords[1] << ", " << ui_coords[2] << ", " << ui_coords[3] << std::endl;
+    cout << "You picked: " << ui_coords[0] << ", " << ui_coords[1] << ", "
+         << ui_coords[2] << ", " << ui_coords[3] << endl;
 
     float start_x = ui_coords[0];
     float start_y = ui_coords[1];
@@ -79,7 +88,7 @@ int main(int argc, const char **argv)
     RoutePlanner route_planner{model, start_x, start_y, end_x, end_y};
     route_planner.AStarSearch();
 
-    std::cout << "Distance: " << route_planner.GetDistance() << " meters. \n";
+    cout << "Distance: " << route_planner.GetDistance() << " meters. \n";
 
     // Render results of search.
     Render render{model};
