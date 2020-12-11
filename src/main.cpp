@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <limits>
 #include <io2d.h>
 #include "route_model.h"
 #include "render.h"
@@ -10,12 +11,14 @@
 
 using namespace std::experimental;
 
-using std::ifstream;
-using std::string;
 using std::cin;
 using std::cout;
 using std::endl;
+using std::ifstream;
+using std::streamsize;
+using std::string;
 using std::vector;
+using std::numeric_limits;
 
 static std::optional<std::vector<std::byte>> ReadFile(const std::string &path) {
   ifstream is{path, std::ios::binary | std::ios::ate};
@@ -66,6 +69,11 @@ int main(int argc, const char **argv)
       while (0.0 > ui_coords[i] || ui_coords[i] > 100.0) {
         cout << "Please enter your " << ui_coords_labels[i] << " coordinate: ";
         cin >> ui_coords[i];
+        if(!cin) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            ui_coords[i] = -1.0;
+            }
         if (0.0 > ui_coords[i] || ui_coords[i] > 100.0)
           cout << "That value is out of range !!! (pick a value between 0 and "
                   "100)"
