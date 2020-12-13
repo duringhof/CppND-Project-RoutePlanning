@@ -24,18 +24,19 @@ float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
 void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
   current_node->FindNeighbors();
   for (RouteModel::Node *neighbor : current_node->neighbors) {
-    neighbor->parent = current_node;
-    neighbor->h_value = CalculateHValue(neighbor);
-    neighbor->g_value =
-        current_node->g_value + current_node->distance(*neighbor);
-    open_list.push_back(neighbor);
-    neighbor->visited = true;
-  };
+    if (neighbor->visited == false) {
+      neighbor->parent = current_node;
+      neighbor->h_value = CalculateHValue(neighbor);
+      neighbor->g_value = current_node->g_value + current_node->distance(*neighbor);
+      open_list.push_back(neighbor);
+      neighbor->visited = true;
+    }
+  }
 }
 
 // TODO 5: Complete the NextNode method to sort the open list and return the
 // next node.
-float Compare(RouteModel::Node* a, RouteModel::Node* b) {
+bool Compare(RouteModel::Node* a, RouteModel::Node* b) {
     float f1 = a->g_value + a->h_value;
     float f2 = b->g_value + b->h_value;
     return f1 > f2;
@@ -65,12 +66,23 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 }
 
 // TODO 7: Write the A* Search algorithm here.
-// Tips:
-// - Use the AddNeighbors method to add all of the neighbors of the current node to the open_list.
-// - Use the NextNode() method to sort the open_list and return the next node.
-// - When the search has reached the end_node, use the ConstructFinalPath method to return the final path that was found.
-// - Store the final path in the m_Model.path attribute before the method exits. This path will then be displayed on the map tile.
-
 void RoutePlanner::AStarSearch() { 
-    
+    RouteModel::Node *current_node = nullptr;
+
+    // TODO: Implement your solution here.
+    open_list.push_back(start_node);
+    start_node->visited = true;
+
+    while (open_list.size() > 0) {
+      current_node = NextNode();
+      open_list.pop_back();
+
+      if (current_node->x == end_node->x &&
+          current_node->y == end_node->y) {
+        m_Model.path = ConstructFinalPath(current_node);
+        break;
+      }
+
+      AddNeighbors(current_node);
+    }
 }
