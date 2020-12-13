@@ -33,20 +33,17 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
   };
 }
 
-// TODO 5: Complete the NextNode method to sort the open list and return the next node.
+// TODO 5: Complete the NextNode method to sort the open list and return the
+// next node.
+float Compare(RouteModel::Node* a, RouteModel::Node* b) {
+    float f1 = a->g_value + a->h_value;
+    float f2 = b->g_value + b->h_value;
+    return f1 > f2;
+}
+
 RouteModel::Node *RoutePlanner::NextNode() {
-  float cost = open_list[0]->h_value + open_list[0]->g_value;
-  float lowestcost = cost;
-  int nodetochoose = 0;
-  for (int i = 1; i <= open_list.size(); i++) {
-    cost = open_list[i]->h_value + open_list[i]->g_value;
-    if (cost < lowestcost) {
-      lowestcost = cost;
-      nodetochoose = i;
-    }
-  }
-  open_list.erase(open_list.begin()+nodetochoose);
-  return open_list[nodetochoose];
+  sort(open_list.begin(), open_list.end(), Compare);
+  return open_list.back();
 }
 
 // TODO 6: Complete the ConstructFinalPath method to return the final path found from your A* search.
@@ -74,9 +71,6 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 // - When the search has reached the end_node, use the ConstructFinalPath method to return the final path that was found.
 // - Store the final path in the m_Model.path attribute before the method exits. This path will then be displayed on the map tile.
 
-void RoutePlanner::AStarSearch() {
-    RouteModel::Node *current_node = nullptr;
-
-    // TODO: Implement your solution here.
-
+void RoutePlanner::AStarSearch() { 
+    
 }
